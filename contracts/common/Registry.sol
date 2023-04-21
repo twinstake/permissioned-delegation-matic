@@ -1,6 +1,9 @@
 
 pragma solidity ^0.5.2;
 
+import "../libraries/Governable.sol";
+import "../interfaces/IWithdrawManager.sol";
+
 contract Registry is Governable {
     // @todo hardcode constants
     bytes32 private constant WETH_TOKEN = keccak256("wethToken");

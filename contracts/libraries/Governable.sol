@@ -1,6 +1,7 @@
 
 pragma solidity ^0.5.2;
 
+import "./interfaces/IGovernance.sol";
 
 contract Governable {
     IGovernance public governance;

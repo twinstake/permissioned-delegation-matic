@@ -1,6 +1,11 @@
 
 pragma solidity ^0.5.2;
 
+import "../common/Initializable.sol";
+import "../common/Registry.sol";
+import "../interfaces/IStakeManagerEventsHub.sol";
+
+
 contract EventsHub is Initializable {
     Registry public registry;
 

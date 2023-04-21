@@ -1,5 +1,15 @@
 pragma solidity 0.5.17;
 
+import "./interfaces/IValidatorShare.sol";
+import "./common/ERC20NonTradable.sol";
+import "./common/OwnableLockable.sol";
+import "./common/Initializable.sol";
+import "./interfaces/IStakeManager.sol";
+import "./staking/EventHub.sol";
+import "./staking/StakingInfo.sol";
+import "./libraries/SafeMath.sol";
+import "./libraries/Ownable.sol";
+
 contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, Initializable {
     struct DelegatorUnbond {
         uint256 shares;
