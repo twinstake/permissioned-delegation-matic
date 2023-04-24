@@ -9,8 +9,9 @@ import "./staking/EventHub.sol";
 import "./staking/StakingInfo.sol";
 import "./libraries/SafeMath.sol";
 import "./libraries/Ownable.sol";
+import "./Whitelist.sol";
 
-contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, Initializable {
+contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, Initializable, Whitelist {
     struct DelegatorUnbond {
         uint256 shares;
         uint256 withdrawEpoch;
@@ -109,7 +110,8 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         Public Methods
      */
 
-    function buyVoucher(uint256 _amount, uint256 _minSharesToMint) public returns(uint256 amountToDeposit) {
+    function buyVoucher(uint256 _amount, uint256 _minSharesToMint) public returns(uint256 amountToDeposit) onlyWhiteListed {
+
         _withdrawAndTransferReward(msg.sender);
         
         amountToDeposit = _buyShares(_amount, _minSharesToMint, msg.sender);
@@ -118,7 +120,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         return amountToDeposit;
     }
 
-    function restake() public returns(uint256, uint256) {
+    function restake() public returns(uint256, uint256) onlyWhiteListed {
         address user = msg.sender;
         uint256 liquidReward = _withdrawReward(user);
         uint256 amountRestaked;
@@ -144,7 +146,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         return (amountRestaked, liquidReward);
     }
 
-    function sellVoucher(uint256 claimAmount, uint256 maximumSharesToBurn) public {
+    function sellVoucher(uint256 claimAmount, uint256 maximumSharesToBurn) public onlyWhiteListed {
         (uint256 shares, uint256 _withdrawPoolShare) = _sellVoucher(claimAmount, maximumSharesToBurn);
 
         DelegatorUnbond memory unbond = unbonds[msg.sender];
@@ -158,12 +160,12 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         logger.logStakeUpdate(validatorId);
     }
 
-    function withdrawRewards() public {
+    function withdrawRewards() public onlyWhiteListed {
         uint256 rewards = _withdrawAndTransferReward(msg.sender);
         require(rewards >= minAmount, "Too small rewards amount");
     }
 
-    function migrateOut(address user, uint256 amount) external onlyOwner {
+    function migrateOut(address user, uint256 amount) external onlyOwner  {
         _withdrawAndTransferReward(user);
         (uint256 totalStaked, uint256 rate) = getTotalStake(user);
         require(totalStaked >= amount, "Migrating too much");
@@ -185,7 +187,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         _buyShares(amount, 0, user);
     }
 
-    function unstakeClaimTokens() public {
+    function unstakeClaimTokens() public onlyWhiteListed {
         DelegatorUnbond memory unbond = unbonds[msg.sender];
         uint256 amount = _unstakeClaimTokens(unbond);
         delete unbonds[msg.sender];
@@ -235,7 +237,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         New shares exit API
      */
 
-    function sellVoucher_new(uint256 claimAmount, uint256 maximumSharesToBurn) public {
+    function sellVoucher_new(uint256 claimAmount, uint256 maximumSharesToBurn) public onlyWhiteListed {
         (uint256 shares, uint256 _withdrawPoolShare) = _sellVoucher(claimAmount, maximumSharesToBurn);
 
         uint256 unbondNonce = unbondNonces[msg.sender].add(1);
@@ -251,7 +253,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         stakingLogger.logStakeUpdate(validatorId);
     }
 
-    function unstakeClaimTokens_new(uint256 unbondNonce) public {
+    function unstakeClaimTokens_new(uint256 unbondNonce) public onlyWhiteListed {
         DelegatorUnbond memory unbond = unbonds_new[msg.sender][unbondNonce];
         uint256 amount = _unstakeClaimTokens(unbond);
         delete unbonds_new[msg.sender][unbondNonce];
