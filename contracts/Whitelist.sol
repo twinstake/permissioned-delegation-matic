@@ -2,7 +2,7 @@ pragma solidity 0.5.17;
 
 contract Whitelist {
 
-    constant private OWNER = "OWNER";
+    bytes32 constant private OWNER = keccak256("OWNER");
 
     mapping(address => bool) public owners;
     mapping(address => bool) public whitelist;

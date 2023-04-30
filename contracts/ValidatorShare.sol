@@ -110,7 +110,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         Public Methods
      */
 
-    function buyVoucher(uint256 _amount, uint256 _minSharesToMint) public returns(uint256 amountToDeposit) onlyWhiteListed {
+    function buyVoucher(uint256 _amount, uint256 _minSharesToMint) public onlyWhiteListed returns(uint256 amountToDeposit)  {
 
         _withdrawAndTransferReward(msg.sender);
         
@@ -120,7 +120,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         return amountToDeposit;
     }
 
-    function restake() public returns(uint256, uint256) onlyWhiteListed {
+    function restake() public onlyWhiteListed returns(uint256, uint256)  {
         address user = msg.sender;
         uint256 liquidReward = _withdrawReward(user);
         uint256 amountRestaked;
