@@ -1,12 +1,11 @@
-import ethUtils from "ethereumjs-util";
-import ethers from "ethers";
+import * as ethUtils from "ethereumjs-util";
+import * as ethers from "ethers";
 
-import { artifacts } from "./artifacts";
+import * as contracts from "./artifacts";
 import * as utils from "./utils";
 
 class Deployer {
   constructor() {
-    this.contracts = await artifacts();
     Object.keys(contracts.childContracts).forEach((c) => {
       // hack for quick fix
       contracts[c] = contracts.childContracts[c];
@@ -24,9 +23,9 @@ class Deployer {
       eventsHubImpl.address,
       eventsHubImpl.contract.methods.initialize(registryAddr).encodeABI()
     );
-
+    4;
     await this.updateContractMap(
-      ethUtils.keccak256("eventsHub"),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("eventsHub")),
       proxy.address
     );
 
@@ -38,7 +37,9 @@ class Deployer {
     this.registry = await contracts.Registry.new(this.governance.address);
 
     this.eventsHub = await this.deployEventsHub(this.registry.address);
+
     this.validatorShareFactory = await contracts.ValidatorShareFactory.new();
+
     this.stakeToken = await contracts.TestToken.new("Stake Token", "ST");
     this.stakingInfo = await contracts.StakingInfo.new(this.registry.address);
     this.slashingManager = await contracts.SlashingManager.new(
@@ -201,6 +202,7 @@ class Deployer {
     this.stakingNFT = await contracts.StakingNFT.new("Matic Validator", "MV");
 
     let stakeManager = await contracts.StakeManagerTestable.new();
+
     const rootChainOwner = wallets[1];
     let proxy = await contracts.StakeManagerProxy.new(utils.ZeroAddress);
     const auctionImpl = await contracts.StakeManagerExtension.new();
@@ -231,15 +233,15 @@ class Deployer {
 
     await this.stakingNFT.transferOwnership(this.stakeManager.address);
     await this.updateContractMap(
-      ethUtils.keccak256("stakeManager"),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("stakeManager")),
       this.stakeManager.address
     );
     await this.updateContractMap(
-      ethUtils.keccak256("validatorShare"),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("validatorShare")),
       this.validatorShare.address
     );
     await this.updateContractMap(
-      ethUtils.keccak256("slashingManager"),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("slashingManager")),
       this.slashingManager.address
     );
     let _contracts = {
@@ -274,7 +276,7 @@ class Deployer {
     await Promise.all([
       this.mapToken(maticWeth.address, maticWeth.address, false /* isERC721 */),
       this.updateContractMap(
-        ethUtils.keccak256("wethToken"),
+        ethers.utils.keccak256(ethers.utils.toUtf8Bytes("wethToken")),
         maticWeth.address
       ),
     ]);
@@ -292,7 +294,7 @@ class Deployer {
   async deployStateSender() {
     this.stateSender = await contracts.StateSender.new();
     await this.updateContractMap(
-      ethUtils.keccak256("stateSender"),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("stateSender")),
       this.stateSender.address
     );
     return this.stateSender;
@@ -307,7 +309,7 @@ class Deployer {
       this.governance.address
     );
     await this.updateContractMap(
-      ethUtils.keccak256("depositManager"),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("depositManager")),
       this.depositManagerProxy.address
     );
     this.depositManager = await contracts.DepositManager.at(
@@ -644,7 +646,7 @@ class Deployer {
     }
     if (options.updateRegistry) {
       await this.updateContractMap(
-        ethUtils.keccak256("childChain"),
+        ethers.utils.keccak256(ethers.utils.toUtf8Bytes("childChain")),
         this.childChain.address
       );
       await this.stateSender.register(

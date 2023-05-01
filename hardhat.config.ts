@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+require("@nomiclabs/hardhat-truffle5");
 
 const MNEMONIC =
   process.env.MNEMONIC ||
@@ -15,6 +16,17 @@ const config: HardhatUserConfig = {
       { version: "0.5.17" },
       { version: "0.5.3" },
     ],
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 2000,
+      },
+    },
+  },
+  networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
   },
 };
 
