@@ -1,10 +1,9 @@
-
-// File: contracts/staking/StakingInfo.sol
-
 pragma solidity ^0.5.2;
-import {Ownable} from "../libraries/Ownable.sol";
-import {SafeMath} from "../libraries/SafeMath.sol";
-import "../common/Registry.sol";
+
+import {Registry} from "../common/Registry.sol";
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 
 // dummy interface to avoid cyclic dependency
 contract IStakeManagerLocal {
