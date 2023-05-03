@@ -10,7 +10,7 @@ import {
   assertBigNumberEquality,
   updateSlashedAmounts,
 } from "../../helpers/utils";
-import { wallets, freshDeploy, approveAndStake } from "./deployment";
+import { getWallets, freshDeploy, approveAndStake } from "./deployment";
 import {
   buyVoucher,
   sellVoucher,
@@ -135,7 +135,14 @@ function shouldWithdrawReward({
 }
 
 describe("ValidatorShare", async function () {
+  let wallets: any, walletAmounts: any;
   const wei100 = toWei("100");
+
+  before(async function () {
+    const wallet = await getWallets();
+    wallets = wallet.wallets;
+    walletAmounts = wallet.walletAmounts;
+  });
 
   async function slash(
     slashes = [],
@@ -162,6 +169,7 @@ describe("ValidatorShare", async function () {
   }
 
   async function doDeploy() {
+    console.log("Deploying fresh contracts");
     await freshDeploy.call(this);
 
     this.stakeToken = await TestToken.new("MATIC", "MATIC");

@@ -211,13 +211,13 @@ class Deployer {
       stakeManager.contract.methods
         .initialize(
           this.registry.address,
-          rootChainOwner.getAddressString(),
+          rootChainOwner.address,
           this.stakeToken.address,
           this.stakingNFT.address,
           this.stakingInfo.address,
           this.validatorShareFactory.address,
           this.governance.address,
-          wallets[0].getAddressString(),
+          wallets[0].address,
           auctionImpl.address
         )
         .encodeABI()
