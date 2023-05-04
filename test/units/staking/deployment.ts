@@ -38,7 +38,9 @@ export const getWallets = async () => {
     },
   };
 
-  return { wallets, walletAmounts };
+  const signer = await ethers.Wallet.createRandom();
+
+  return { wallets, walletAmounts, signer };
 };
 
 export async function freshDeploy() {
@@ -100,12 +102,14 @@ export async function approveAndStake({
     from: wallet.address,
   });
 
+  console.log(signer);
+
   await this.stakeManager.stakeFor(
     wallet.address,
     stakeAmount,
     fee,
     acceptDelegation,
-    signer || wallet.address,
+    signer || wallet.publicKey,
     {
       from: wallet.address,
     }

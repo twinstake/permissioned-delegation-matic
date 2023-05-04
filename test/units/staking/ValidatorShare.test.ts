@@ -17,6 +17,7 @@ import {
   sellVoucherNew,
 } from "./ValidatorShareHelper";
 import { web3 } from "@openzeppelin/test-helpers/src/setup";
+import { ethers } from "hardhat";
 
 const toWei = web3.utils.toWei;
 const ZeroAddr = "0x0000000000000000000000000000000000000000";
@@ -135,13 +136,14 @@ function shouldWithdrawReward({
 }
 
 describe("ValidatorShare", async function () {
-  let wallets: any, walletAmounts: any;
+  let wallets: any, walletAmounts: any, signer: any;
   const wei100 = toWei("100");
 
   before(async function () {
     const wallet = await getWallets();
     wallets = wallet.wallets;
     walletAmounts = wallet.walletAmounts;
+    signer = wallet.signer;
   });
 
   async function slash(
@@ -185,12 +187,19 @@ describe("ValidatorShare", async function () {
     await this.stakeManager.updateDynastyValue(Dynasty);
     await this.stakeManager.updateValidatorThreshold(8);
 
+    const publicKey = ethers.utils.computePublicKey(signer.publicKey, true);
+    console.log(publicKey, signer.publicKey);
+
+    const compressedPublicKey = publicKey.slice(2);
+
+    console.log(compressedPublicKey);
     // we need to increase validator id beyond foundation id, repeat 7 times
     for (let i = 0; i < 7; ++i) {
       await approveAndStake.call(this, {
         wallet: this.validatorUser,
         stakeAmount: this.stakeAmount,
         acceptDelegation: true,
+        signer: compressedPublicKey,
       });
       await this.governance.update(
         this.stakeManager.address,
@@ -210,6 +219,7 @@ describe("ValidatorShare", async function () {
       wallet: this.validatorUser,
       stakeAmount: this.stakeAmount,
       acceptDelegation: true,
+      signer: compressedPublicKey,
     });
     await this.stakeManager.forceFinalizeCommit();
 
