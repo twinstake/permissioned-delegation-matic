@@ -109,7 +109,8 @@ export async function checkPoint(
   // 2/3 majority vote
   await stakeManager.checkSignatures(
     blockInterval,
-    ethUtils.bufferToHex(ethUtils.keccak256(voteData)),
+    // @ts-ignore
+    ethUtils.bufferToHex(ethUtils.keccak256(Buffer.from(voteData))),
     stateRoot,
     proposer.getAddressString(),
     sigs,

@@ -801,6 +801,7 @@ contract StakeManager is
     function _getAndAssertSigner(bytes memory pub) private view returns (address) {
         require(pub.length == 64, "not pub");
         address signer = address(uint160(uint256(keccak256(pub))));
+     
         require(signer != address(0) && signerToValidator[signer] == 0, "Invalid signer");
         return signer;
     }

@@ -1,10 +1,14 @@
 import chai from "chai";
 import web3 from "web3";
+import Wallet from "ethereumjs-wallet";
+import * as EthUtil from "ethereumjs-util";
 import chaiAsPromised from "chai-as-promised";
 import deployer from "../../helpers/deployer";
 import { generateFirstWallets, mnemonics } from "../../helpers/wallets";
 import { BN } from "@openzeppelin/test-helpers";
 import { ethers } from "hardhat";
+import dotenv from "dotenv";
+dotenv.config();
 
 chai.use(chaiAsPromised).should();
 
@@ -38,7 +42,9 @@ export const getWallets = async () => {
     },
   };
 
-  const signer = await ethers.Wallet.createRandom();
+  const privateKeyString = process.env.PRIVATE_KEY;
+  const privateKeyBuffer = EthUtil.toBuffer(privateKeyString);
+  const signer = Wallet.fromPrivateKey(privateKeyBuffer);
 
   return { wallets, walletAmounts, signer };
 };
@@ -101,8 +107,6 @@ export async function approveAndStake({
   await this.stakeToken.approve(this.stakeManager.address, new BN(mintAmount), {
     from: wallet.address,
   });
-
-  console.log(signer);
 
   await this.stakeManager.stakeFor(
     wallet.address,

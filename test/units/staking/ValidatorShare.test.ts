@@ -187,19 +187,15 @@ describe("ValidatorShare", async function () {
     await this.stakeManager.updateDynastyValue(Dynasty);
     await this.stakeManager.updateValidatorThreshold(8);
 
-    const publicKey = ethers.utils.computePublicKey(signer.publicKey, true);
-    console.log(publicKey, signer.publicKey);
+    const publicKey = signer.getPublicKeyString();
 
-    const compressedPublicKey = publicKey.slice(2);
-
-    console.log(compressedPublicKey);
     // we need to increase validator id beyond foundation id, repeat 7 times
     for (let i = 0; i < 7; ++i) {
       await approveAndStake.call(this, {
         wallet: this.validatorUser,
         stakeAmount: this.stakeAmount,
         acceptDelegation: true,
-        signer: compressedPublicKey,
+        signer: publicKey,
       });
       await this.governance.update(
         this.stakeManager.address,
@@ -208,18 +204,16 @@ describe("ValidatorShare", async function () {
       await this.stakeManager.forceFinalizeCommit();
       await this.stakeManager.advanceEpoch(Dynasty);
       await this.stakeManager.unstakeClaim(i + 1, {
-        from: this.validatorUser.getChecksumAddressString(),
+        from: this.validatorUser.address,
       });
-      await this.stakeManager.resetSignerUsed(
-        this.validatorUser.getChecksumAddressString()
-      );
+      await this.stakeManager.resetSignerUsed(this.validatorUser.address);
     }
 
     await approveAndStake.call(this, {
       wallet: this.validatorUser,
       stakeAmount: this.stakeAmount,
       acceptDelegation: true,
-      signer: compressedPublicKey,
+      signer: publicKey,
     });
     await this.stakeManager.forceFinalizeCommit();
 
@@ -254,7 +248,7 @@ describe("ValidatorShare", async function () {
       it("reverts", async function () {
         await expectRevert.unspecified(
           this.validatorContract.updateDelegation(false, {
-            from: wallets[1].getAddressString(),
+            from: wallets[1].address,
           })
         );
       });
@@ -265,7 +259,7 @@ describe("ValidatorShare", async function () {
 
       it("updates delegation", async function () {
         await this.stakeManager.updateValidatorDelegation(false, {
-          from: this.validatorUser.getAddressString(),
+          from: this.validatorUser.address,
         });
       });
     });
@@ -279,7 +273,7 @@ describe("ValidatorShare", async function () {
         this.value = toWei("10");
         await this.testToken.mint(this.validatorContract.address, this.value);
 
-        this.user = wallets[2].getChecksumAddressString();
+        this.user = wallets[2].address;
         this.userOldBalance = await this.testToken.balanceOf(this.user);
       });
     }
@@ -288,8 +282,8 @@ describe("ValidatorShare", async function () {
   function deployAliceAndBob() {
     before(doDeploy);
     before("Alice & Bob", async function () {
-      this.alice = wallets[2].getChecksumAddressString();
-      this.bob = wallets[3].getChecksumAddressString();
+      this.alice = wallets[2].address;
+      this.bob = wallets[3].address;
       this.totalStaked = new BN(0);
 
       const mintAmount = new BN(toWei("70000"));
@@ -384,7 +378,7 @@ describe("ValidatorShare", async function () {
 
       before("disable delegation", async function () {
         await this.stakeManager.updateValidatorDelegation(false, {
-          from: this.validatorUser.getChecksumAddressString(),
+          from: this.validatorUser.address,
         });
       });
 
@@ -695,7 +689,7 @@ describe("ValidatorShare", async function () {
       deployAliceAndBob();
       before(async function () {
         await this.stakeManager.unstake(this.validatorId, {
-          from: this.validatorUser.getChecksumAddressString(),
+          from: this.validatorUser.address,
         });
         await this.stakeManager.advanceEpoch(Dynasty);
       });
@@ -714,7 +708,7 @@ describe("ValidatorShare", async function () {
       before(doDeploy);
 
       before(async function () {
-        this.user = wallets[2].getAddressString();
+        this.user = wallets[2].address;
         this.totalStaked = new BN(0);
 
         const voucherAmount = new BN(toWei("70000"));
@@ -765,7 +759,7 @@ describe("ValidatorShare", async function () {
     describe("when Alice purchases voucher and sells it", function () {
       before(doDeploy);
       before(async function () {
-        this.user = wallets[2].getAddressString();
+        this.user = wallets[2].address;
         await this.stakeToken.mint(this.user, toWei("250"));
 
         this.beforeExchangeRate = await this.validatorContract.exchangeRate();
@@ -793,7 +787,7 @@ describe("ValidatorShare", async function () {
 
       describe("when Alice is slashed by 50%", function () {
         before(async function () {
-          this.user = wallets[2].getAddressString();
+          this.user = wallets[2].address;
           await this.stakeToken.mint(this.user, this.stakeAmount);
 
           await this.stakeToken.approve(
@@ -828,7 +822,7 @@ describe("ValidatorShare", async function () {
 
       describe("when Bob purchases a voucher", function () {
         before(async function () {
-          this.user = wallets[1].getAddressString();
+          this.user = wallets[1].address;
           await this.stakeToken.mint(this.user, this.stakeAmount);
 
           this.beforeExchangeRate = await this.validatorContract.exchangeRate();
@@ -858,7 +852,7 @@ describe("ValidatorShare", async function () {
     describe("when all tokens are slashed", function () {
       before(doDeploy);
       before(async function () {
-        this.user = wallets[2].getAddressString();
+        this.user = wallets[2].address;
         await this.stakeToken.mint(this.user, toWei("250"));
         await this.stakeToken.approve(this.stakeManager.address, toWei("250"), {
           from: this.user,
@@ -891,8 +885,8 @@ describe("ValidatorShare", async function () {
   describe("sellVoucher", function () {
     const aliceStake = new BN(toWei("100"));
     const bobStake = new BN(toWei("200"));
-    const Alice = wallets[2].getChecksumAddressString();
-    const Bob = wallets[1].getChecksumAddressString();
+    const Alice = wallets[2].address;
+    const Bob = wallets[1].address;
 
     async function doDeployAndBuyVoucherForAliceAndBob(includeBob = false) {
       await doDeploy.call(this);
@@ -1170,7 +1164,7 @@ describe("ValidatorShare", async function () {
       before(doDeployAndBuyVoucherForAliceAndBob);
       before(async function () {
         await this.stakeManager.unstake(this.validatorId, {
-          from: this.validatorUser.getChecksumAddressString(),
+          from: this.validatorUser.address,
         });
         await this.stakeManager.advanceEpoch(Dynasty);
       });
@@ -1419,10 +1413,10 @@ describe("ValidatorShare", async function () {
   });
 
   describe("withdrawRewards", function () {
-    const Alice = wallets[2].getChecksumAddressString();
-    const Bob = wallets[3].getChecksumAddressString();
-    const Eve = wallets[4].getChecksumAddressString();
-    const Carol = wallets[5].getChecksumAddressString();
+    const Alice = wallets[2].address;
+    const Bob = wallets[3].address;
+    const Eve = wallets[4].address;
+    const Carol = wallets[5].address;
 
     let totalDelegatorRewardsReceived;
     let totalSlashed;
@@ -1558,7 +1552,7 @@ describe("ValidatorShare", async function () {
           );
 
           await this.stakeManager.withdrawRewards(this.validatorId, {
-            from: this.validatorUser.getChecksumAddressString(),
+            from: this.validatorUser.address,
           });
 
           const tokensLeft = await this.stakeToken.balanceOf(
@@ -2029,7 +2023,7 @@ describe("ValidatorShare", async function () {
           this.stakeManager
         );
         await this.stakeManager.unstake(this.validatorId, {
-          from: this.validatorUser.getChecksumAddressString(),
+          from: this.validatorUser.address,
         });
         await this.stakeManager.advanceEpoch(Dynasty);
       });
@@ -2094,7 +2088,7 @@ describe("ValidatorShare", async function () {
     function prepareForTest({ skipCheckpoint } = {}) {
       before(doDeploy);
       before(async function () {
-        this.user = wallets[2].getChecksumAddressString();
+        this.user = wallets[2].address;
 
         await this.stakeToken.mint(this.user, this.stakeAmount);
         await this.stakeToken.approve(
@@ -2198,7 +2192,7 @@ describe("ValidatorShare", async function () {
       prepareForTest();
       before(async function () {
         await this.stakeManager.unstake(this.validatorId, {
-          from: this.validatorUser.getChecksumAddressString(),
+          from: this.validatorUser.address,
         });
       });
 
@@ -2230,7 +2224,7 @@ describe("ValidatorShare", async function () {
     function prepareForTest({ skipSell, skipBuy } = {}) {
       before(doDeploy);
       before(async function () {
-        this.user = wallets[2].getChecksumAddressString();
+        this.user = wallets[2].address;
 
         await this.stakeToken.mint(this.user, this.stakeAmount);
         await this.stakeToken.approve(
