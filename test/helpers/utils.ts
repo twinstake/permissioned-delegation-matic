@@ -113,7 +113,9 @@ export async function checkPoint(
     getSigs(wallets, ethUtils.keccak256(Buffer.from(voteData)), order)
   );
 
-  const stateRoot = ethUtils.bufferToHex(ethUtils.keccak256("stateRoot"));
+  const stateRoot = ethUtils.bufferToHex(
+    ethUtils.keccak256(Buffer.from("stateRoot"))
+  );
   // 2/3 majority vote
   await stakeManager.checkSignatures(
     blockInterval,
