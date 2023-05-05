@@ -26,6 +26,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
+      chainId: 1337,
     },
   },
 };

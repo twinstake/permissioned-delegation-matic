@@ -9,6 +9,7 @@ import Web3 from "web3";
 
 import { generateFirstWallets, mnemonics } from "./wallets";
 import logDecoder from "./log-decoder";
+import { ethers, config } from "hardhat";
 
 // console.log(ethUtils.keccak256('depositTokens(address,address,uint256,uint256)').slice(0, 4))
 
@@ -39,14 +40,20 @@ export function getSigs(wallets, votedata, order = true) {
 
   if (order) {
     copyWallets.sort((w1, w2) => {
-      return w1.getAddressString().localeCompare(w2.getAddressString());
+      return w1.address.localeCompare(w2.address);
     });
   }
+  const accounts = config.networks.hardhat.accounts;
 
-  const h = ethUtils.toBuffer(votedata);
+  return copyWallets.map((w, index) => {
+    const wallet1 = ethers.Wallet.fromMnemonic(
+      accounts.mnemonic,
+      accounts.path + `/${index}`
+    );
+    const h = ethUtils.toBuffer(votedata);
+    const privateKey = wallet1.privateKey;
 
-  return copyWallets.map((w) => {
-    const vrs = ethUtils.ecsign(h, w.getPrivateKey());
+    const vrs = ethUtils.ecsign(h, ethUtils.toBuffer(privateKey));
     return ethUtils.toRpcSig(vrs.v, vrs.r, vrs.s);
   });
 }
@@ -54,7 +61,7 @@ export function getSigs(wallets, votedata, order = true) {
 export function getSigsWithVotes(_wallets, data, sigPrefix, maxYesVotes) {
   let wallets = [..._wallets];
   wallets.sort((w1, w2) => {
-    return w1.getAddressString().localeCompare(w2.getAddressString());
+    return w1.address.localeCompare(w2.address);
   });
 
   return wallets.map((w, index) => {
@@ -102,20 +109,20 @@ export async function checkPoint(
 ) {
   const voteData = "dummyData";
   const sigs = encodeSigsForCheckpoint(
-    getSigs(wallets, ethUtils.keccak256(voteData), order)
+    // @ts-ignore
+    getSigs(wallets, ethUtils.keccak256(Buffer.from(voteData)), order)
   );
 
   const stateRoot = ethUtils.bufferToHex(ethUtils.keccak256("stateRoot"));
   // 2/3 majority vote
   await stakeManager.checkSignatures(
     blockInterval,
-    // @ts-ignore
     ethUtils.bufferToHex(ethUtils.keccak256(Buffer.from(voteData))),
     stateRoot,
-    proposer.getAddressString(),
+    proposer.address,
     sigs,
     {
-      from: (rootchainOwner || proposer).getAddressString(),
+      from: (rootchainOwner || proposer).address,
     }
   );
 }
@@ -128,11 +135,11 @@ export async function updateSlashedAmounts(
   slashingManager,
   options = {}
 ) {
-  let data = Web3.eth.abi.encodeParameters(
+  let data = new Web3().eth.abi.encodeParameters(
     ["uint256", "address", "bytes"],
     [
       _slashingNonce,
-      proposer.getAddressString(),
+      proposer.address,
       ethUtils.bufferToHex(ethUtils.rlp.encode(slashingInfoList)),
     ]
   );
@@ -144,7 +151,7 @@ export async function updateSlashedAmounts(
     encodeSigs(getSigs(wallets, ethUtils.keccak256(sigData)))
   );
   return slashingManager.updateSlashedAmounts(data, sigs, {
-    from: proposer.getAddressString(),
+    from: proposer.address,
   });
 }
 
