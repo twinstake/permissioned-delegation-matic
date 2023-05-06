@@ -9,8 +9,9 @@ import {OwnableLockable} from "../../common/mixin/OwnableLockable.sol";
 import {IStakeManager} from "../stakeManager/IStakeManager.sol";
 import {IValidatorShare} from "./IValidatorShare.sol";
 import {Initializable} from "../../common/mixin/Initializable.sol";
+import {Whitelist} from "../../Whitelist.sol";
 
-contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, Initializable {
+contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, Initializable , Whitelist{
     struct DelegatorUnbond {
         uint256 shares;
         uint256 withdrawEpoch;
@@ -109,7 +110,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         Public Methods
      */
 
-    function buyVoucher(uint256 _amount, uint256 _minSharesToMint) public returns(uint256 amountToDeposit) {
+    function buyVoucher(uint256 _amount, uint256 _minSharesToMint) onlyWhiteListed public returns(uint256 amountToDeposit) {
         _withdrawAndTransferReward(msg.sender);
         
         amountToDeposit = _buyShares(_amount, _minSharesToMint, msg.sender);
@@ -118,7 +119,7 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
         return amountToDeposit;
     }
 
-    function restake() public returns(uint256, uint256) {
+    function restake() onlyWhiteListed public returns(uint256, uint256) {
         address user = msg.sender;
         uint256 liquidReward = _withdrawReward(user);
         uint256 amountRestaked;
