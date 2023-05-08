@@ -105,6 +105,8 @@ contract StakeManager is
         auctionPeriod = (2**13) / 4; // 1 week in epochs
         proposerBonus = 10; // 10 % of total rewards
         delegationEnabled = true;
+
+        Whitelist__initialize(_owner);
     }
 
     function isOwner() public view returns (bool) {

@@ -20,6 +20,11 @@ contract Whitelist {
         _;
     }
 
+    function Whitelist__initialize(address _owner) public {
+        owners[_owner] = true;
+        addWhitelist(_owner);
+    }
+
     function addWhitelist(address account) public onlyRole(OWNER) {
         whitelist[account] = true;
         emit WhitelistAdded(account);
