@@ -8,7 +8,7 @@ This project extends the staking contract codebase from matic[https://github.com
 
 ```shell
 npx hardhat help
-npx hardhat test
+npx hardhat test test/units/staking/ValidatorShare.test.ts
 ```
 
 ## Deployment
