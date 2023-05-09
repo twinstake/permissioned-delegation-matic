@@ -393,6 +393,10 @@ describe("ValidatorShare", async function () {
         await this.stakeManager.updateValidatorDelegation(false, {
           from: this.validatorUser.address,
         });
+
+        await this.validatorContract.addWhitelist(this.alice, {
+          from: wallets[0].address,
+        });
       });
 
       it("reverts", async function () {
@@ -413,6 +417,17 @@ describe("ValidatorShare", async function () {
             .setDelegationEnabled(false)
             .encodeABI()
         );
+
+        await expectRevert(
+          this.validatorContract.buyVoucher(toWei("100"), toWei("100") || 0, {
+            from: this.alice,
+          }),
+          "not whitelisted"
+        );
+
+        await this.validatorContract.addWhitelist(this.alice, {
+          from: wallets[0].address,
+        });
       });
 
       it("reverts", async function () {
@@ -687,6 +702,15 @@ describe("ValidatorShare", async function () {
 
       it("reverts", async function () {
         await expectRevert(
+          this.validatorContract.buyVoucher(toWei("100"), toWei("100") || 0, {
+            from: this.alice,
+          }),
+          "not whitelisted"
+        );
+
+        await this.validatorContract.addWhitelist(this.alice);
+
+        await expectRevert(
           buyVoucher(
             this.validatorContract,
             toWei("100"),
@@ -733,6 +757,15 @@ describe("ValidatorShare", async function () {
             from: this.user,
           }
         );
+
+        await expectRevert(
+          this.validatorContract.buyVoucher(toWei("100"), toWei("100") || 0, {
+            from: this.alice,
+          }),
+          "not whitelisted"
+        );
+
+        await this.validatorContract.addWhitelist(this.alice);
       });
 
       it("must buy voucher", async function () {
