@@ -1,7 +1,7 @@
 pragma solidity 0.5.17;
-import "hardhat/console.sol";
+import {OwnableLockable} from "./common/mixin/OwnableLockable.sol";
 
-contract Whitelist {
+contract Whitelist is OwnableLockable {
 
     mapping(address => bool) public owners;
     mapping(address => bool) public whitelist;
@@ -9,37 +9,45 @@ contract Whitelist {
     event WhitelistAdded(address indexed account);
     event WhitelistRemoved(address indexed account);
 
-    modifier onlyOwner() {
+    modifier onlyWhitelistedOwner() {
         require(owners[msg.sender], "not owner");
         _;
     }
 
     modifier onlyWhiteListed() {
-        require(whitelist[msg.sender], "not whitelisted");
+        require(whitelist[msg.sender] , "not whitelisted");
         _;
     }
 
     function Whitelist__initialize(address _owner) public {
         owners[_owner] = true;
-        addWhitelist(_owner);
-        console.log(_owner);
+        whitelist[_owner] = true;
+     
     }
 
-    function addWhitelist(address account) public onlyOwner {
+    function addWhitelist(address account) public onlyWhitelistedOwner {
         whitelist[account] = true;
         emit WhitelistAdded(account);
     }
 
-    function removeWhitelist(address account) public onlyOwner {
+    function removeWhitelist(address account) public onlyWhitelistedOwner {
         whitelist[account] = false;
         emit WhitelistRemoved(account);
     }
 
-    function addOwner(address _newOwner) public onlyOwner {
+    function addOwner(address _newOwner) public onlyWhitelistedOwner {
         addWhitelist(_newOwner);
     }
 
-    function removeOwner(address _oldOwner) public onlyOwner { 
+    function removeOwner(address _oldOwner) public onlyWhitelistedOwner { 
         removeWhitelist(_oldOwner);
+    }
+
+    function isWhitelisted(address account) public view returns (bool) {
+        return whitelist[account];
+    }
+
+    function isWhitelistedOwner(address account) public view returns (bool) {
+        return owners[account];
     }
 }

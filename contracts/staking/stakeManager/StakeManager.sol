@@ -1098,7 +1098,7 @@ contract StakeManager is
             jailTime: 0,
             signer: signer,
             contractAddress: acceptDelegation
-                ? validatorShareFactory.create(validatorId, address(_logger), registry, owner())
+                ? validatorShareFactory.create(validatorId, address(_logger), registry)
                 : address(0x0),
             status: Status.Active,
             commissionRate: 0,

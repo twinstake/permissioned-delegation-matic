@@ -5,13 +5,13 @@ import {ERC20NonTradable} from "../../common/tokens/ERC20NonTradable.sol";
 import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import {StakingInfo} from "./../StakingInfo.sol";
 import {EventsHub} from "./../EventsHub.sol";
-import {OwnableLockable} from "../../common/mixin/OwnableLockable.sol";
+
 import {IStakeManager} from "../stakeManager/IStakeManager.sol";
 import {IValidatorShare} from "./IValidatorShare.sol";
 import {Initializable} from "../../common/mixin/Initializable.sol";
 import {Whitelist} from "../../Whitelist.sol";
 
-contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, Initializable , Whitelist{
+contract ValidatorShare is IValidatorShare, ERC20NonTradable, Initializable , Whitelist {
     struct DelegatorUnbond {
         uint256 shares;
         uint256 withdrawEpoch;
@@ -53,18 +53,17 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
     function initialize(
         uint256 _validatorId,
         address _stakingLogger,
-        address _stakeManager
+        address _stakeManager,
+        address _owner
     ) external initializer {
         validatorId = _validatorId;
         stakingLogger = StakingInfo(_stakingLogger);
         stakeManager = IStakeManager(_stakeManager);
         _transferOwnership(_stakeManager);
         _getOrCacheEventsHub();
-
         minAmount = 10**18;
         delegation = true;
-
-        Whitelist__initialize(msg.sender);
+        Whitelist__initialize(_owner);
     }
 
     /**
