@@ -18,6 +18,7 @@ import {
 } from "./ValidatorShareHelper";
 import { web3 } from "@openzeppelin/test-helpers/src/setup";
 import { ethers } from "hardhat";
+import { expect } from "chai";
 
 const toWei = web3.utils.toWei;
 const ZeroAddr = "0x0000000000000000000000000000000000000000";
@@ -262,6 +263,56 @@ describe("ValidatorShare", async function () {
           from: this.validatorUser.address,
         });
       });
+    });
+  });
+
+  describe("Whitelist", function () {
+    before(doDeploy);
+
+    before(async function () {
+      this.user = wallets[1].address;
+    });
+
+    it("anyone other than owner cannot update whitelist", async function () {
+      await expectRevert(
+        this.validatorContract.addWhitelist(this.user, {
+          from: this.user,
+        }),
+        "not owner"
+      );
+    });
+    it("anyone other than existing owner cannot update existing owner", async function () {
+      await expectRevert(
+        this.validatorContract.addOwner(this.user, {
+          from: this.user,
+        }),
+        "not owner"
+      );
+    });
+
+    it("reverts if user not whitelisted", async function () {
+      await expectRevert(
+        this.validatorContract.buyVoucher(toWei("100"), toWei("100") || 0, {
+          from: this.user,
+        }),
+        "not whitelisted"
+      );
+    });
+
+    it("passes on whitelisted user", async function () {
+      await this.validatorContract.addOwner(this.user, {
+        from: wallets[0].address,
+      });
+
+      expect(await this.validatorContract.isOwner(this.user)).to.be.true;
+    });
+
+    it("passes on whitelisted user", async function () {
+      await this.validatorContract.addWhitelist(this.user, {
+        from: wallets[0].address,
+      });
+
+      expect(await this.validatorContract.isWhitelisted(this.user)).to.be.true;
     });
   });
 
