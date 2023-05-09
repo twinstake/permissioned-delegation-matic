@@ -300,7 +300,7 @@ describe("ValidatorShare", async function () {
     });
   }
 
-  describe("buyVoucher", function () {
+  describe.only("buyVoucher", function () {
     function testBuyVoucher({
       voucherValue,
       voucherValueExpected,
@@ -310,6 +310,17 @@ describe("ValidatorShare", async function () {
       reward,
       initialBalance,
     }) {
+      it("Should rever since user isn't whitelist", async function () {
+        expectRevert(
+          await this.validatorContract.buyVoucher(),
+          "Not whitelisted"
+        );
+      });
+
+      it("Should whitelist user", async function () {
+        await this.validatorContract.addWhitelist(this.user);
+      });
+
       it("must buy voucher", async function () {
         this.receipt = await buyVoucher(
           this.validatorContract,
@@ -337,11 +348,15 @@ describe("ValidatorShare", async function () {
       });
     }
 
-    describe("when Alice purchases voucher once", function () {
+    describe.only("when Alice purchases voucher once", function () {
       deployAliceAndBob();
 
-      before(function () {
+      before(async function () {
         this.user = this.alice;
+        console.log("wallets", wallets);
+        await this.validatorContract.addWhitelist(this.user, {
+          from: wallets[1].address,
+        });
       });
 
       testBuyVoucher({

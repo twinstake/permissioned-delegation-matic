@@ -63,6 +63,8 @@ contract ValidatorShare is IValidatorShare, ERC20NonTradable, OwnableLockable, I
 
         minAmount = 10**18;
         delegation = true;
+
+        Whitelist__initialize(msg.sender);
     }
 
     /**

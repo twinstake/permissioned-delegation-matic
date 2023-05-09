@@ -7,7 +7,7 @@ contract ValidatorShareFactory {
     /**
     - factory to create new validatorShare contracts
    */
-    function create(uint256 validatorId, address loggerAddress, address registry) public returns (address) {
+    function create(uint256 validatorId, address loggerAddress, address registry, address owner) public returns (address) {
         ValidatorShareProxy proxy = new ValidatorShareProxy(registry);
 
         proxy.transferOwnership(msg.sender);
@@ -18,7 +18,8 @@ contract ValidatorShareFactory {
                 ValidatorShare(proxyAddr).initialize.selector, 
                 validatorId, 
                 loggerAddress, 
-                msg.sender
+                msg.sender, 
+                owner
             )
         );
         require(success, string(data));

@@ -1,8 +1,7 @@
 pragma solidity 0.5.17;
+import "hardhat/console.sol";
 
 contract Whitelist {
-
-    bytes32 constant private OWNER = keccak256("OWNER");
 
     mapping(address => bool) public owners;
     mapping(address => bool) public whitelist;
@@ -10,7 +9,7 @@ contract Whitelist {
     event WhitelistAdded(address indexed account);
     event WhitelistRemoved(address indexed account);
 
-    modifier onlyRole(bytes32 role) {
+    modifier onlyOwner() {
         require(owners[msg.sender], "not owner");
         _;
     }
@@ -23,23 +22,24 @@ contract Whitelist {
     function Whitelist__initialize(address _owner) public {
         owners[_owner] = true;
         addWhitelist(_owner);
+        console.log(_owner);
     }
 
-    function addWhitelist(address account) public onlyRole(OWNER) {
+    function addWhitelist(address account) public onlyOwner {
         whitelist[account] = true;
         emit WhitelistAdded(account);
     }
 
-    function removeWhitelist(address account) public onlyRole(OWNER) {
+    function removeWhitelist(address account) public onlyOwner {
         whitelist[account] = false;
         emit WhitelistRemoved(account);
     }
 
-    function addOwner(address _newOwner) public onlyRole(OWNER) {
+    function addOwner(address _newOwner) public onlyOwner {
         addWhitelist(_newOwner);
     }
 
-    function removeOwner(address _oldOwner) public onlyRole(OWNER) { 
+    function removeOwner(address _oldOwner) public onlyOwner { 
         removeWhitelist(_oldOwner);
     }
 }

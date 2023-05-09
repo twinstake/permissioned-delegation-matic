@@ -106,7 +106,7 @@ contract StakeManager is
         proposerBonus = 10; // 10 % of total rewards
         delegationEnabled = true;
 
-        Whitelist__initialize(_owner);
+    
     }
 
     function isOwner() public view returns (bool) {
@@ -1098,7 +1098,7 @@ contract StakeManager is
             jailTime: 0,
             signer: signer,
             contractAddress: acceptDelegation
-                ? validatorShareFactory.create(validatorId, address(_logger), registry)
+                ? validatorShareFactory.create(validatorId, address(_logger), registry, owner())
                 : address(0x0),
             status: Status.Active,
             commissionRate: 0,
