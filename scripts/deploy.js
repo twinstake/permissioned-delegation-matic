@@ -7,21 +7,22 @@
 const hre = require("hardhat");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  // fill these up
+  const nftCounter = 0;
+  const registry = "0x0000000";
+  const stakingLogger = "0x0000000";
 
-  const lockedAmount = hre.ethers.utils.parseEther("0.001");
+  const ValidatorShare = await hre.ethers.getContractFactory("ValidatorShare");
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  const validatorShare = await hre.upgrades.deployProxy(ValidatorShare, [
+    nftCounter,
+    _logger,
+    registry,
+  ]);
 
-  await lock.deployed();
+  await validatorShare.deployed();
 
-  console.log(
-    `Lock with ${ethers.utils.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+  console.log(`Validator Contract deployed to ${validatorShare.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

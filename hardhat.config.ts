@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 require("@nomiclabs/hardhat-truffle5");
+require("@openzeppelin/hardhat-upgrades");
 
 const MNEMONIC =
   process.env.MNEMONIC ||
