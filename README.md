@@ -1,13 +1,18 @@
-# Sample Hardhat Project
+# Twinstake Matic Validator Share
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This project extends the staking contract codebase from matic[https://github.com/maticnetwork/contracts] to introduce a whitelist in validator share contract to meet twinstake KYC enabled requirement needs.
 
-Try running some of the following tasks:
+`ValidatorShare.sol`: Smart contract with whitelist integrated Validator Share code.
+`Whitelist.sol` : Smart contract with whitelist logic.
+`ValidatorShare.test.ts`: Test file containing all logical test flows for ValidatorShare with whitelist.
 
 ```shell
 npx hardhat help
 npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
 ```
+
+## Deployment
+
+Thers is a deployment script in path `scripts/deploy.js` to deploy the Validator Share contract with proxy. To run the script update the variables `nftCounter`, `registry` and `stakingLogger` using the deployed address of staking manager on polygon.
+
+Post deployment, on staking manager `function updateValidatorContractAddress(uint256 validatorId, address newContractAddress) ` will need to be called to update our validatorId address mapping.
