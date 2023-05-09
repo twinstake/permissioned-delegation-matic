@@ -729,6 +729,7 @@ describe("ValidatorShare", async function () {
           from: this.validatorUser.address,
         });
         await this.stakeManager.advanceEpoch(Dynasty);
+        await this.validatorContract.addWhitelist(this.alice);
       });
 
       it("reverts", async function () {
@@ -758,14 +759,7 @@ describe("ValidatorShare", async function () {
           }
         );
 
-        await expectRevert(
-          this.validatorContract.buyVoucher(toWei("100"), toWei("100") || 0, {
-            from: this.alice,
-          }),
-          "not whitelisted"
-        );
-
-        await this.validatorContract.addWhitelist(this.alice);
+        await this.validatorContract.addWhitelist(this.user);
       });
 
       it("must buy voucher", async function () {
@@ -812,6 +806,7 @@ describe("ValidatorShare", async function () {
         await this.stakeToken.approve(this.stakeManager.address, toWei("250"), {
           from: this.user,
         });
+        await this.validatorContract.addWhitelist(this.user);
       });
 
       it("must purchase voucher", async function () {
@@ -843,7 +838,7 @@ describe("ValidatorShare", async function () {
               from: this.user,
             }
           );
-
+          await this.validatorContract.addWhitelist(this.user);
           await buyVoucher(this.validatorContract, this.stakeAmount, this.user);
         });
         before("slash", async function () {
@@ -879,7 +874,7 @@ describe("ValidatorShare", async function () {
               from: this.user,
             }
           );
-
+          await this.validatorContract.addWhitelist(this.user);
           await buyVoucher(this.validatorContract, this.stakeAmount, this.user);
         });
 
@@ -903,6 +898,7 @@ describe("ValidatorShare", async function () {
         await this.stakeToken.approve(this.stakeManager.address, toWei("250"), {
           from: this.user,
         });
+        await this.validatorContract.addWhitelist(this.user);
         await buyVoucher(this.validatorContract, toWei("100"), this.user);
         // slash all tokens
         await slash.call(
