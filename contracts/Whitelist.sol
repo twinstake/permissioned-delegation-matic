@@ -6,6 +6,9 @@ contract Whitelist is OwnableLockable {
     mapping(address => bool) public owners;
     mapping(address => bool) public whitelist;
 
+
+    event OwnerAdded(address indexed account);
+    event OwnerRemoved(address indexed account);
     event WhitelistAdded(address indexed account);
     event WhitelistRemoved(address indexed account);
 
@@ -36,11 +39,13 @@ contract Whitelist is OwnableLockable {
     }
 
     function addOwner(address _newOwner) public onlyWhitelistedOwner {
-        addWhitelist(_newOwner);
+       owners[_newOwner] = true;
+       emit OwnerAdded(_newOwner);
     }
 
     function removeOwner(address _oldOwner) public onlyWhitelistedOwner { 
-        removeWhitelist(_oldOwner);
+        owners[_oldOwner] = false;
+        emit OwnerRemoved(_oldOwner);
     }
 
     function isWhitelisted(address account) public view returns (bool) {

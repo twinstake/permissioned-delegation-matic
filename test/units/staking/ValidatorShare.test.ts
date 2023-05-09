@@ -18,7 +18,6 @@ import {
 } from "./ValidatorShareHelper";
 import { web3 } from "@openzeppelin/test-helpers/src/setup";
 import { ethers } from "hardhat";
-import { expect } from "chai";
 
 const toWei = web3.utils.toWei;
 const ZeroAddr = "0x0000000000000000000000000000000000000000";
@@ -299,20 +298,34 @@ describe("ValidatorShare", async function () {
       );
     });
 
-    it("passes on whitelisted user", async function () {
-      await this.validatorContract.addOwner(this.user, {
+    it("passes on whitelisted owner", async function () {
+      this.receipt = await this.validatorContract.addOwner(this.user, {
         from: wallets[0].address,
       });
 
-      expect(await this.validatorContract.isOwner(this.user)).to.be.true;
+      await expectEvent.inTransaction(
+        this.receipt.tx,
+        ValidatorShare,
+        "OwnerAdded",
+        {
+          account: this.user,
+        }
+      );
     });
 
     it("passes on whitelisted user", async function () {
-      await this.validatorContract.addWhitelist(this.user, {
+      this.receipt = await this.validatorContract.addWhitelist(this.user, {
         from: wallets[0].address,
       });
 
-      expect(await this.validatorContract.isWhitelisted(this.user)).to.be.true;
+      await expectEvent.inTransaction(
+        this.receipt.tx,
+        ValidatorShare,
+        "WhitelistAdded",
+        {
+          account: this.user,
+        }
+      );
     });
   });
 
