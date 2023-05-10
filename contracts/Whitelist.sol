@@ -9,8 +9,8 @@ contract Whitelist is OwnableLockable {
 
     event OwnerAdded(address indexed account);
     event OwnerRemoved(address indexed account);
-    event WhitelistAdded(address indexed account);
-    event WhitelistRemoved(address indexed account);
+    event AccountAddedToWhitelist(address indexed account);
+    event AccountRemovedFromWhitelist(address indexed account);
 
     modifier onlyWhitelistedOwner() {
         require(owners[msg.sender], "not owner");
@@ -28,14 +28,14 @@ contract Whitelist is OwnableLockable {
      
     }
 
-    function addWhitelist(address account) public onlyWhitelistedOwner {
+    function addToWhitelist(address account) public onlyWhitelistedOwner {
         whitelist[account] = true;
-        emit WhitelistAdded(account);
+        emit AccountAddedToWhitelist(account);
     }
 
-    function removeWhitelist(address account) public onlyWhitelistedOwner {
+    function removeFromWhitelist(address account) public onlyWhitelistedOwner {
         whitelist[account] = false;
-        emit WhitelistRemoved(account);
+        emit AccountRemovedFromWhitelist(account);
     }
 
     function addOwner(address _newOwner) public onlyWhitelistedOwner {

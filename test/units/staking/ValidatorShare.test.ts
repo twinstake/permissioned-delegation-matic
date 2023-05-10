@@ -274,7 +274,7 @@ describe("ValidatorShare", async function () {
 
     it("anyone other than owner cannot update whitelist", async function () {
       await expectRevert(
-        this.validatorContract.addWhitelist(this.user, {
+        this.validatorContract.addToWhitelist(this.user, {
           from: this.user,
         }),
         "not owner"
@@ -314,14 +314,14 @@ describe("ValidatorShare", async function () {
     });
 
     it("passes on whitelisted user", async function () {
-      this.receipt = await this.validatorContract.addWhitelist(this.user, {
+      this.receipt = await this.validatorContract.addToWhitelist(this.user, {
         from: wallets[0].address,
       });
 
       await expectEvent.inTransaction(
         this.receipt.tx,
         ValidatorShare,
-        "WhitelistAdded",
+        "AccountAddedToWhitelist",
         {
           account: this.user,
         }
@@ -375,7 +375,7 @@ describe("ValidatorShare", async function () {
       initialBalance,
     }) {
       it("Should whitelist user", async function () {
-        await this.validatorContract.addWhitelist(this.user);
+        await this.validatorContract.addToWhitelist(this.user);
       });
 
       it("must buy voucher", async function () {
@@ -416,7 +416,7 @@ describe("ValidatorShare", async function () {
           }),
           "not whitelisted"
         );
-        await this.validatorContract.addWhitelist(this.user, {
+        await this.validatorContract.addToWhitelist(this.user, {
           from: wallets[0].address,
         });
       });
@@ -458,7 +458,7 @@ describe("ValidatorShare", async function () {
           from: this.validatorUser.address,
         });
 
-        await this.validatorContract.addWhitelist(this.alice, {
+        await this.validatorContract.addToWhitelist(this.alice, {
           from: wallets[0].address,
         });
       });
@@ -489,7 +489,7 @@ describe("ValidatorShare", async function () {
           "not whitelisted"
         );
 
-        await this.validatorContract.addWhitelist(this.alice, {
+        await this.validatorContract.addToWhitelist(this.alice, {
           from: wallets[0].address,
         });
       });
@@ -772,7 +772,7 @@ describe("ValidatorShare", async function () {
           "not whitelisted"
         );
 
-        await this.validatorContract.addWhitelist(this.alice);
+        await this.validatorContract.addToWhitelist(this.alice);
 
         await expectRevert(
           buyVoucher(
@@ -793,7 +793,7 @@ describe("ValidatorShare", async function () {
           from: this.validatorUser.address,
         });
         await this.stakeManager.advanceEpoch(Dynasty);
-        await this.validatorContract.addWhitelist(this.alice);
+        await this.validatorContract.addToWhitelist(this.alice);
       });
 
       it("reverts", async function () {
@@ -823,7 +823,7 @@ describe("ValidatorShare", async function () {
           }
         );
 
-        await this.validatorContract.addWhitelist(this.user);
+        await this.validatorContract.addToWhitelist(this.user);
       });
 
       it("must buy voucher", async function () {
@@ -870,7 +870,7 @@ describe("ValidatorShare", async function () {
         await this.stakeToken.approve(this.stakeManager.address, toWei("250"), {
           from: this.user,
         });
-        await this.validatorContract.addWhitelist(this.user);
+        await this.validatorContract.addToWhitelist(this.user);
       });
 
       it("must purchase voucher", async function () {
@@ -902,7 +902,7 @@ describe("ValidatorShare", async function () {
               from: this.user,
             }
           );
-          await this.validatorContract.addWhitelist(this.user);
+          await this.validatorContract.addToWhitelist(this.user);
           await buyVoucher(this.validatorContract, this.stakeAmount, this.user);
         });
         before("slash", async function () {
@@ -938,7 +938,7 @@ describe("ValidatorShare", async function () {
               from: this.user,
             }
           );
-          await this.validatorContract.addWhitelist(this.user);
+          await this.validatorContract.addToWhitelist(this.user);
           await buyVoucher(this.validatorContract, this.stakeAmount, this.user);
         });
 
@@ -962,7 +962,7 @@ describe("ValidatorShare", async function () {
         await this.stakeToken.approve(this.stakeManager.address, toWei("250"), {
           from: this.user,
         });
-        await this.validatorContract.addWhitelist(this.user);
+        await this.validatorContract.addToWhitelist(this.user);
         await buyVoucher(this.validatorContract, toWei("100"), this.user);
         // slash all tokens
         await slash.call(
