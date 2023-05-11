@@ -6,6 +6,11 @@ This project extends the staking contract codebase from matic[https://github.com
 `Whitelist.sol` : Smart contract with whitelist logic.
 `ValidatorShare.test.ts`: Test file containing all logical test flows for ValidatorShare with whitelist.
 
+## Setup
+
+1. create `.env` using `.env.example` file as reference.
+2. run `yarn install`
+
 ```shell
 npx hardhat help
 npx hardhat test test/units/staking/ValidatorShare.test.ts
